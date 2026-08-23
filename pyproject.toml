@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "isbnconv"
+version = "0.1.0"
+description = "Convert between ISBN-10 and ISBN-13"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "njohnson368" }]
+
+[project.scripts]
+isbnconv = "isbnconv.cli:main"
+
+[tool.setuptools]
+packages = ["isbnconv"]
