@@ -13,5 +13,8 @@ authors = [{ name = "njohnson368" }]
 [project.scripts]
 isbnconv = "isbnconv.cli:main"
 
+[project.optional-dependencies]
+test = ["pytest"]
+
 [tool.setuptools]
 packages = ["isbnconv"]

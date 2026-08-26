@@ -62,3 +62,10 @@ pip install -e .
 ```
 
 or just run it in place with `python -m isbnconv`.
+
+## Testing
+
+```
+pip install -e ".[test]"
+pytest
+```
