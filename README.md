@@ -40,13 +40,22 @@ $ printf '0306406152\n1234567890\n' | python -m isbnconv
 Lines that are blank or start with `#` are skipped, so you can keep comments
 in your input files.
 
+Use `--validate-only` to check ISBNs without converting them:
+
+```
+$ printf '0306406152\n1234567890\n' | python -m isbnconv --validate-only
+0306406152: valid
+1234567890: invalid
+```
+
 ## As a library
 
 ```python
-from isbnconv import convert, is_valid_isbn10, is_valid_isbn13
+from isbnconv import convert, is_valid, is_valid_isbn10, is_valid_isbn13
 
 convert("0-306-40615-2")   # "9780306406157"
 is_valid_isbn13("9780306406157")  # True
+is_valid("9780306406157")  # True, auto-detects the format from length
 ```
 
 Note that ISBN-13s starting with `979` (a range assigned after the ISBN-10

@@ -45,6 +45,16 @@ def is_valid_isbn13(raw: str) -> bool:
     return isbn13_check_digit(isbn[:12]) == isbn[12]
 
 
+def is_valid(raw: str) -> bool:
+    """Validate an ISBN in either format, auto-detecting which one from length."""
+    isbn = clean(raw)
+    if len(isbn) == 10:
+        return is_valid_isbn10(isbn)
+    if len(isbn) == 13:
+        return is_valid_isbn13(isbn)
+    return False
+
+
 def isbn10_to_isbn13(raw: str) -> str:
     isbn = clean(raw)
     if not is_valid_isbn10(isbn):

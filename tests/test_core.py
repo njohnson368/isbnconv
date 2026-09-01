@@ -100,6 +100,34 @@ class TestValidation:
         assert not core.is_valid_isbn13(isbn)
 
 
+class TestIsValid:
+    @pytest.mark.parametrize(
+        "isbn",
+        [
+            "0306406152",
+            "0-306-40615-2",
+            "097522980X",
+            "9780306406157",
+            "978-0-306-40615-7",
+            "9790306406156",
+        ],
+    )
+    def test_valid_either_format(self, isbn):
+        assert core.is_valid(isbn)
+
+    @pytest.mark.parametrize(
+        "isbn",
+        [
+            "0306406153",  # 10 digits, wrong check digit
+            "9780306406158",  # 13 digits, wrong check digit
+            "12345",  # neither length
+            "",
+        ],
+    )
+    def test_invalid(self, isbn):
+        assert not core.is_valid(isbn)
+
+
 class TestConversion:
     def test_isbn10_to_isbn13(self):
         assert core.isbn10_to_isbn13("0-306-40615-2") == "9780306406157"
