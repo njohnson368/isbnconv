@@ -21,12 +21,25 @@ def isbn10_check_digit(digits9: str) -> str:
     return "X" if check == 10 else str(check)
 
 
-def isbn13_check_digit(digits12: str) -> str:
+def ean13_check_digit(digits12: str) -> str:
+    """Mod-10 check digit shared by EAN-13, UPC-A (via a leading 0), and ISBN-13."""
     if len(digits12) != 12 or not digits12.isdigit():
         raise ValueError(f"expected 12 digits, got {digits12!r}")
     total = sum(int(d) * (1 if i % 2 == 0 else 3) for i, d in enumerate(digits12))
     check = (10 - (total % 10)) % 10
     return str(check)
+
+
+def isbn13_check_digit(digits12: str) -> str:
+    return ean13_check_digit(digits12)
+
+
+def upca_check_digit(digits11: str) -> str:
+    """UPC-A is EAN-13's algorithm one digit short; padding with a leading 0
+    lines its weights (3, 1, 3, 1, ...) up with EAN-13's (1, 3, 1, 3, ...)."""
+    if len(digits11) != 11 or not digits11.isdigit():
+        raise ValueError(f"expected 11 digits, got {digits11!r}")
+    return ean13_check_digit("0" + digits11)
 
 
 def is_valid_isbn10(raw: str) -> bool:
@@ -43,6 +56,20 @@ def is_valid_isbn13(raw: str) -> bool:
     if len(isbn) != 13 or not isbn.isdigit():
         return False
     return isbn13_check_digit(isbn[:12]) == isbn[12]
+
+
+def is_valid_ean13(raw: str) -> bool:
+    barcode = clean(raw)
+    if len(barcode) != 13 or not barcode.isdigit():
+        return False
+    return ean13_check_digit(barcode[:12]) == barcode[12]
+
+
+def is_valid_upca(raw: str) -> bool:
+    barcode = clean(raw)
+    if len(barcode) != 12 or not barcode.isdigit():
+        return False
+    return upca_check_digit(barcode[:11]) == barcode[11]
 
 
 def is_valid(raw: str) -> bool:

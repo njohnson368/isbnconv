@@ -48,6 +48,44 @@ class TestIsbn13CheckDigit:
             core.isbn13_check_digit("97803064061X")
 
 
+class TestEan13CheckDigit:
+    def test_known_value(self):
+        # 4006381333931, a commonly cited EAN-13 example
+        assert core.ean13_check_digit("400638133393") == "1"
+
+    def test_matches_isbn13_check_digit(self):
+        # ISBN-13 is just EAN-13 with a Bookland prefix, so the two must agree.
+        assert core.ean13_check_digit("978030640615") == core.isbn13_check_digit(
+            "978030640615"
+        )
+
+    def test_rejects_wrong_length(self):
+        with pytest.raises(ValueError):
+            core.ean13_check_digit("40063813339")  # 11 digits
+        with pytest.raises(ValueError):
+            core.ean13_check_digit("4006381333931")  # 13 digits
+
+    def test_rejects_non_digits(self):
+        with pytest.raises(ValueError):
+            core.ean13_check_digit("40063813339X")
+
+
+class TestUpcaCheckDigit:
+    def test_known_value(self):
+        # 036000291452, a commonly cited UPC-A example
+        assert core.upca_check_digit("03600029145") == "2"
+
+    def test_rejects_wrong_length(self):
+        with pytest.raises(ValueError):
+            core.upca_check_digit("0360002914")  # 10 digits
+        with pytest.raises(ValueError):
+            core.upca_check_digit("036000291452")  # 12 digits
+
+    def test_rejects_non_digits(self):
+        with pytest.raises(ValueError):
+            core.upca_check_digit("0360002914X")
+
+
 class TestValidation:
     @pytest.mark.parametrize(
         "isbn",
@@ -98,6 +136,43 @@ class TestValidation:
     )
     def test_invalid_isbn13(self, isbn):
         assert not core.is_valid_isbn13(isbn)
+
+
+class TestEan13AndUpcaValidation:
+    @pytest.mark.parametrize(
+        "barcode",
+        [
+            "4006381333931",
+            "9780306406157",  # every valid ISBN-13 is a valid EAN-13
+        ],
+    )
+    def test_valid_ean13(self, barcode):
+        assert core.is_valid_ean13(barcode)
+
+    @pytest.mark.parametrize(
+        "barcode",
+        [
+            "4006381333930",  # wrong check digit
+            "400638133393",  # too short
+            "40063813339311",  # too long
+        ],
+    )
+    def test_invalid_ean13(self, barcode):
+        assert not core.is_valid_ean13(barcode)
+
+    def test_valid_upca(self):
+        assert core.is_valid_upca("036000291452")
+
+    @pytest.mark.parametrize(
+        "barcode",
+        [
+            "036000291453",  # wrong check digit
+            "03600029145",  # too short
+            "0360002914521",  # too long
+        ],
+    )
+    def test_invalid_upca(self, barcode):
+        assert not core.is_valid_upca(barcode)
 
 
 class TestIsValid:

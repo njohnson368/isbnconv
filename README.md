@@ -62,6 +62,20 @@ Note that ISBN-13s starting with `979` (a range assigned after the ISBN-10
 space filled up) have no ISBN-10 equivalent; converting one raises
 `ValueError`.
 
+ISBN-13's check digit is really just the EAN-13 barcode algorithm, and
+UPC-A uses the same algorithm one digit shorter (pad an 11-digit UPC-A
+payload with a leading 0 and it lines up with EAN-13's weights). Those are
+exposed directly for barcode use outside of books:
+
+```python
+from isbnconv import ean13_check_digit, is_valid_ean13, is_valid_upca, upca_check_digit
+
+ean13_check_digit("400638133393")  # "1"
+is_valid_ean13("4006381333931")    # True
+upca_check_digit("03600029145")    # "2"
+is_valid_upca("036000291452")      # True
+```
+
 ## Install
 
 No dependencies beyond the standard library.
