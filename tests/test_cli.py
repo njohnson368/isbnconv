@@ -73,6 +73,31 @@ def test_batch_continues_after_invalid_entry(tmp_path, capsys):
     assert "1234567890" in captured.err
 
 
+def test_missing_file_reports_error_and_nonzero_exit(tmp_path, capsys):
+    missing = tmp_path / "does-not-exist.txt"
+
+    exit_code = cli.main([str(missing)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert captured.out == ""
+    assert str(missing) in captured.err
+    assert "No such file or directory" in captured.err
+
+
+def test_batch_continues_after_missing_file(tmp_path, capsys):
+    missing = tmp_path / "does-not-exist.txt"
+    present = tmp_path / "books.txt"
+    present.write_text("0306406152\n")
+
+    exit_code = cli.main([str(missing), str(present)])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "0306406152 -> 9780306406157" in captured.out
+    assert str(missing) in captured.err
+
+
 def test_multiple_files_are_concatenated(tmp_path, capsys):
     first = tmp_path / "a.txt"
     second = tmp_path / "b.txt"

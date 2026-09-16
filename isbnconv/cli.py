@@ -32,22 +32,26 @@ def main(argv=None) -> int:
 
     had_error = False
     for path in args.files:
-        for raw_line in _lines_from(path):
-            line = raw_line.strip()
-            if not line or line.startswith("#"):
-                continue
-            if args.validate_only:
-                if is_valid(line):
-                    print(f"{line}: valid")
-                else:
+        try:
+            for raw_line in _lines_from(path):
+                line = raw_line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if args.validate_only:
+                    if is_valid(line):
+                        print(f"{line}: valid")
+                    else:
+                        had_error = True
+                        print(f"{line}: invalid")
+                    continue
+                try:
+                    print(f"{line} -> {convert(line)}")
+                except ValueError as exc:
                     had_error = True
-                    print(f"{line}: invalid")
-                continue
-            try:
-                print(f"{line} -> {convert(line)}")
-            except ValueError as exc:
-                had_error = True
-                print(f"{line}: {exc}", file=sys.stderr)
+                    print(f"{line}: {exc}", file=sys.stderr)
+        except OSError as exc:
+            had_error = True
+            print(f"{path}: {exc.strerror or exc}", file=sys.stderr)
 
     return 1 if had_error else 0
 
